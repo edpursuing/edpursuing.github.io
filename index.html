@@ -219,9 +219,9 @@
   }
 
   .project-visual {
-    background: var(--linen);
+    background: #e8eaf0;
     border-radius: 6px;
-    aspect-ratio: 4/3;
+    aspect-ratio: 16/9;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -235,6 +235,49 @@
     height: 100%;
     object-fit: cover;
     border-radius: 6px;
+  }
+
+  /* ── MOBILE GALLERY ────────────────────── */
+  .project-visual--mobile {
+    display: flex;
+    gap: 12px;
+    padding: 24px 20px;
+    background: #1a1a1a;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .phone-frame {
+    flex: 1;
+    height: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .phone-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+  }
+
+  /* ── CYCLE IMAGE HOVER ─────────────────── */
+  .cycle-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 6px;
+    transition: opacity 0.45s ease;
+  }
+
+  .cycle-img:not(:first-child) {
+    opacity: 0;
   }
 
   .project-visual-placeholder {
@@ -575,10 +618,12 @@
   <div class="section-label">Featured Work</div>
   <h2 class="section-title">Selected projects, with full context.</h2>
 
-  <!-- 01 — CallScore -->
+  <!-- 01 — Quorum -->
   <div class="featured-project">
     <div class="project-visual">
-      <span class="project-visual-placeholder">Screenshot coming</span>
+      <img src="images/quorum-dashboard.png" alt="Quorum manager dashboard" class="cycle-img">
+      <img src="images/quorum-review.png" alt="Quorum compliance review" class="cycle-img">
+      <img src="images/quorum-login.png" alt="Quorum role selection" class="cycle-img">
     </div>
     <div class="project-content">
       <div class="project-number">01</div>
@@ -605,8 +650,16 @@
 
   <!-- 02 — Hoppin' -->
   <div class="featured-project reverse">
-    <div class="project-visual">
-      <span class="project-visual-placeholder">Screenshot coming</span>
+    <div class="project-visual project-visual--mobile">
+      <div class="phone-frame">
+        <img src="images/hoppin-rides.jpg" alt="Hoppin' ride board">
+      </div>
+      <div class="phone-frame">
+        <img src="images/hoppin-booking.jpg" alt="Hoppin' active ride booking">
+      </div>
+      <div class="phone-frame">
+        <img src="images/hoppin-history.jpg" alt="Hoppin' ride history">
+      </div>
     </div>
     <div class="project-content">
       <div class="project-number">02</div>
@@ -780,5 +833,38 @@
   </div>
 </footer>
 
+<script>
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.featured-project').forEach(project => {
+      const imgs = project.querySelectorAll('.cycle-img');
+      if (imgs.length < 2) return;
+
+      imgs.forEach((img, i) => { img.style.opacity = i === 0 ? '1' : '0'; });
+      let lastIndex = 0;
+
+      function update() {
+        const rect = project.getBoundingClientRect();
+        const vh = window.innerHeight;
+
+        const triggerStart = vh * 0.65;
+        const triggerEnd   = vh * -0.1;
+        const zone = triggerStart - triggerEnd;
+
+        const progress = (triggerStart - rect.top) / zone;
+        const clamped   = Math.max(0, Math.min(1, progress));
+        const imageIndex = Math.min(Math.floor(clamped * imgs.length), imgs.length - 1);
+
+        if (imageIndex !== lastIndex) {
+          imgs[lastIndex].style.opacity = '0';
+          imgs[imageIndex].style.opacity = '1';
+          lastIndex = imageIndex;
+        }
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    });
+  });
+</script>
 </body>
 </html>
